@@ -1,13 +1,13 @@
 package org.example.project.components.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -30,26 +30,34 @@ import org.jetbrains.compose.resources.painterResource
 import java.time.LocalDate
 
 @Composable
-fun RemindersScreen(viewModel: SharedViewModel, date: LocalDate) {
+fun RemindersScreen(
+    viewModel: SharedViewModel,
+    date: LocalDate,
+    modifier: Modifier = Modifier
+) {
     val tasks by remember(date, viewModel.tasksState) {
-        derivedStateOf {
-            viewModel.getTasksFor(date.plusDays(1))
-        }
+        derivedStateOf { viewModel.getTasksFor(date.plusDays(1)) }
     }
 
-    Column {
+    Column(modifier = modifier) {
         TomorrowReminderHeader()
 
         if (tasks.isNotEmpty()) {
-            TomorrowReminderContent(
-                tasks = tasks,
-                modifier = Modifier.padding(top = 16.dp)
-            )
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(tasks, key = { it.title + it.starttime }) { task ->
+                    ReminderItem(task = task)
+                }
+            }
         } else {
-            Text(
-                text = "Nothing",
-                modifier = Modifier.padding(top = 16.dp)
-            )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No reminders for tomorrow")
+            }
         }
     }
 }
@@ -75,39 +83,21 @@ private fun TomorrowReminderHeader() {
 }
 
 @Composable
-private fun TomorrowReminderContent(
-    tasks: List<Task>,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier
-    ) {
-        tasks.forEach { task ->
-            ReminderItem(task = task)
-        }
-    }
-}
-
-@Composable
 fun ReminderItem(task: Task) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                color = Color(0xFF8572FF),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(10.dp)
+            .background(Color(0xFF8572FF), shape = RoundedCornerShape(12.dp))
+            .padding(16.dp)
     ) {
         Image(
             painter = painterResource(Res.drawable.calendar_icon),
             contentDescription = "Calendar",
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(40.dp)
         )
 
-        Column(modifier = Modifier.padding(start = 24.dp)) {
+        Column(modifier = Modifier.padding(start = 16.dp)) {
             Text(
                 text = task.title,
                 fontSize = 14.sp,
@@ -115,13 +105,16 @@ fun ReminderItem(task: Task) {
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
-            Text(
-                text = task.note,
-                fontSize = 13.sp,
-                fontFamily = InterFontFamily(),
-                fontWeight = FontWeight.Normal,
-                color = Color.White
-            )
+
+            if (task.note.isNotBlank()) {
+                Text(
+                    text = task.note,
+                    fontSize = 13.sp,
+                    fontFamily = InterFontFamily(),
+                    color = Color.White.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
 
             ReminderTime(time = "${task.starttime} - ${task.endtime}")
         }
@@ -137,14 +130,14 @@ private fun ReminderTime(time: String) {
         Image(
             painter = painterResource(Res.drawable.time_icon),
             contentDescription = "Time",
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(16.dp)
         )
         Text(
             text = time,
             fontSize = 13.sp,
             fontFamily = InterFontFamily(),
             color = Color.White,
-            modifier = Modifier.padding(start = 12.dp)
+            modifier = Modifier.padding(start = 8.dp)
         )
     }
 }

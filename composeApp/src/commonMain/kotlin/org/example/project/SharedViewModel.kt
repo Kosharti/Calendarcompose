@@ -12,16 +12,15 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class SharedViewModel : ViewModel() {
-    val name = MutableStateFlow("")
+    val name = MutableStateFlow("Shuri")
     val tasksState = MutableStateFlow(TasksState())
     val notifyActive = MutableStateFlow(false)
     val message = MutableStateFlow("")
 
     fun showNotification(text: String) {
-        message.value = text
-        notifyActive.value = true
-
         viewModelScope.launch {
+            message.value = text
+            notifyActive.value = true
             delay(4000)
             notifyActive.value = false
         }
@@ -31,24 +30,26 @@ class SharedViewModel : ViewModel() {
         val newStart = LocalTime.parse(newTask.starttime)
         val newEnd = LocalTime.parse(newTask.endtime)
 
-        val filteredTasks = tasksState.value.allTasks.filter { task ->
-            if (task.date != newTask.date) return@filter true
+        if (newStart >= newEnd) return false
 
-            val start = LocalTime.parse(task.starttime)
-            val end = LocalTime.parse(task.endtime)
-            newEnd <= start || newStart >= end
+        val hasConflict = tasksState.value.allTasks.any { task ->
+            task.date == newTask.date &&
+                    LocalTime.parse(task.starttime) < newEnd &&
+                    LocalTime.parse(task.endtime) > newStart
         }
 
-        val updatedTasks = filteredTasks + newTask
+        if (hasConflict) return false
 
         tasksState.update { current ->
-            current.copy(allTasks = updatedTasks)
+            current.copy(allTasks = current.allTasks + newTask)
         }
+        showNotification("Added: ${newTask.title}")
         return true
     }
 
-
     fun getTasksFor(date: LocalDate): List<Task> {
-        return tasksState.value.allTasks.filter { it.date == date }
+        return tasksState.value.allTasks
+            .filter { it.date == date }
+            .sortedBy { LocalTime.parse(it.starttime) }
     }
 }
