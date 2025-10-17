@@ -24,8 +24,8 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun Home(viewModel: SharedViewModel){
-    val name by viewModel.name.collectAsState()
+fun Home(){
+
 
     Row (
         verticalAlignment = Alignment.CenterVertically

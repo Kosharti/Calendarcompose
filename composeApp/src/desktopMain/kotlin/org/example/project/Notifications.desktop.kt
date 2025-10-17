@@ -59,7 +59,7 @@ actual fun Notify(message: String) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .background(Color(0xFF323232), RoundedCornerShape(12.dp))
+                    .background(Color(0xFFFFD700), RoundedCornerShape(12.dp))
                     .padding(horizontal = 16.dp, vertical = 12.dp)
                     .fillMaxWidth()
             ) {

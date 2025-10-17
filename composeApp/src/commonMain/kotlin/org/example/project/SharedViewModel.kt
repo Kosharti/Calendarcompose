@@ -12,7 +12,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class SharedViewModel : ViewModel() {
-    val name = MutableStateFlow("Shuri")
+    //val name = MutableStateFlow("Shuri")
     val tasksState = MutableStateFlow(TasksState())
     val notifyActive = MutableStateFlow(false)
     val message = MutableStateFlow("")

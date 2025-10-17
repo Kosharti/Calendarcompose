@@ -29,7 +29,7 @@ fun HomeScreen(
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        Home(viewModel)
+        Home()
 
         Calendar(
             selectedDate = selectedDate,
