@@ -2,8 +2,8 @@ package org.example.project
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.example.project.data.Task
@@ -14,36 +14,17 @@ import java.time.LocalTime
 
 class SharedViewModel : ViewModel() {
     val tasksState = MutableStateFlow(TasksState())
-    val notifyActive = MutableStateFlow(false)
-    val message = MutableStateFlow("")
-    val notificationTitle = MutableStateFlow("")
 
-    private val notificationManager by lazy { NotificationManager() }
+    private var notificationService: NotificationService? = null
 
-    init {
-        NotificationSystem.setNotificationHandler { title, message ->
-            showTimedNotification(title, message)
-        }
+    // Для Android версии
+    fun initializeWithContext(context: Any) {
+        notificationService = NotificationService(context)
     }
 
-    fun showNotification(text: String) {
-        viewModelScope.launch {
-            message.value = text
-            notificationTitle.value = "Новая задача"
-            notifyActive.value = true
-            delay(4000)
-            notifyActive.value = false
-        }
-    }
-
-    private fun showTimedNotification(title: String, text: String) {
-        viewModelScope.launch {
-            notificationTitle.value = title
-            message.value = text
-            notifyActive.value = true
-            delay(5000)
-            notifyActive.value = false
-        }
+    // Для Desktop версии
+    fun initializeForDesktop() {
+        notificationService = NotificationService(null)
     }
 
     fun addTask(newTask: Task): Boolean {
@@ -65,16 +46,23 @@ class SharedViewModel : ViewModel() {
         }
 
         scheduleTaskNotification(newTask)
-
-        showNotification("Добавлена задача: ${newTask.title}")
+        showTaskCreationNotification(newTask) // ВЫЗОВ СИСТЕМНОГО УВЕДОМЛЕНИЯ
         return true
     }
 
     private fun scheduleTaskNotification(task: Task) {
         viewModelScope.launch {
             val taskDateTime = LocalDateTime.of(task.date, LocalTime.parse(task.starttime))
-            notificationManager.scheduleTaskNotification(task, taskDateTime)
+            NotificationManager(notificationService).scheduleTaskNotification(task, taskDateTime)
         }
+    }
+
+    private fun showTaskCreationNotification(task: Task) {
+        // ПРЯМОЙ ВЫЗОВ СИСТЕМНОГО УВЕДОМЛЕНИЯ
+        notificationService?.showNotification(
+            "Добавлена задача: ${task.title}",
+            "Время: ${task.starttime} - ${task.endtime}"
+        )
     }
 
     fun getTasksFor(date: LocalDate): List<Task> {

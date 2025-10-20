@@ -23,7 +23,7 @@ fun TaskSet(
     sharedViewModel: SharedViewModel,
     navController: NavController
 ) {
-    val scheduleViewModel: ScheduleViewModel = viewModel()
+    val scheduleViewModel = remember { ScheduleViewModel() }
 
     val selectedDate by scheduleViewModel.selectedDate.collectAsState()
     val startHour by scheduleViewModel.startHour.collectAsState()

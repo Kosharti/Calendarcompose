@@ -23,7 +23,7 @@ fun HomeScreen(
     sharedViewModel: SharedViewModel,
     modifier: Modifier = Modifier
 ) {
-    val homeViewModel: HomeViewModel = viewModel()
+    val homeViewModel = remember { HomeViewModel() }
 
     LaunchedEffect(sharedViewModel.tasksState.value.allTasks) {
         homeViewModel.addTasks(sharedViewModel.tasksState.value.allTasks)
