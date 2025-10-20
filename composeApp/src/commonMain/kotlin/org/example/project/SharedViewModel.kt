@@ -9,13 +9,15 @@ import kotlinx.coroutines.launch
 import org.example.project.data.Task
 import org.example.project.data.TasksState
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 class SharedViewModel : ViewModel() {
-    //val name = MutableStateFlow("Shuri")
     val tasksState = MutableStateFlow(TasksState())
     val notifyActive = MutableStateFlow(false)
     val message = MutableStateFlow("")
+
+    private val notificationManager by lazy { NotificationManager() }
 
     fun showNotification(text: String) {
         viewModelScope.launch {
@@ -43,13 +45,33 @@ class SharedViewModel : ViewModel() {
         tasksState.update { current ->
             current.copy(allTasks = current.allTasks + newTask)
         }
+
+        scheduleTaskNotification(newTask)
+
         showNotification("Added: ${newTask.title}")
         return true
+    }
+
+    private fun scheduleTaskNotification(task: Task) {
+        viewModelScope.launch {
+            val taskDateTime = LocalDateTime.of(task.date, LocalTime.parse(task.starttime))
+            notificationManager.scheduleTaskNotification(task, taskDateTime)
+        }
     }
 
     fun getTasksFor(date: LocalDate): List<Task> {
         return tasksState.value.allTasks
             .filter { it.date == date }
             .sortedBy { LocalTime.parse(it.starttime) }
+    }
+
+    fun getAllTasks(): List<Task> = tasksState.value.allTasks
+
+    fun setAllTasks(tasks: List<Task>) {
+        tasksState.update { current ->
+            current.copy(allTasks = tasks)
+        }
+
+        tasks.forEach { scheduleTaskNotification(it) }
     }
 }
