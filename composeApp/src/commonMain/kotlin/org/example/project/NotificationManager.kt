@@ -13,17 +13,26 @@ class NotificationManager {
 
         if (delayMillis > 0) {
             delay(delayMillis)
-            // Здесь будет вызов системы уведомлений
-            // Для демонстрации просто показываем уведомление в UI
-            // В реальном приложении здесь будет WorkManager или AlarmManager
             showTaskReminderNotification(task)
         }
     }
 
     private fun showTaskReminderNotification(task: Task) {
-        // В реальном приложении здесь будет вызов системы уведомлений
-        // Для Compose Desktop можно показать системное уведомление
-        // Для Android - использовать NotificationCompat
-        println("REMINDER: ${task.title} at ${task.starttime}")
+        NotificationSystem.showTaskReminder(
+            "Напоминание: ${task.title}",
+            "Время: ${task.starttime} - ${task.endtime}\n${task.note}"
+        )
+    }
+}
+
+object NotificationSystem {
+    private var notificationHandler: ((String, String) -> Unit)? = null
+
+    fun setNotificationHandler(handler: (String, String) -> Unit) {
+        notificationHandler = handler
+    }
+
+    fun showTaskReminder(title: String, message: String) {
+        notificationHandler?.invoke(title, message)
     }
 }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -24,6 +23,7 @@ fun App() {
 
         val notifyActive by viewModel.notifyActive.collectAsState()
         val message by viewModel.message.collectAsState()
+        val notificationTitle by viewModel.notificationTitle.collectAsState()
 
         AnimatedVisibility(
             visible = notifyActive,
@@ -31,7 +31,7 @@ fun App() {
             exit = fadeOut() + slideOutVertically { -40 },
             modifier = Modifier.zIndex(2f)
         ) {
-            Notify(message)
+            TimedNotification(title = notificationTitle, message = message)
         }
 
         Column {

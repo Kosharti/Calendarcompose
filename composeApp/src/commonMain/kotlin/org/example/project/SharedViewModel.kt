@@ -16,14 +16,32 @@ class SharedViewModel : ViewModel() {
     val tasksState = MutableStateFlow(TasksState())
     val notifyActive = MutableStateFlow(false)
     val message = MutableStateFlow("")
+    val notificationTitle = MutableStateFlow("")
 
     private val notificationManager by lazy { NotificationManager() }
+
+    init {
+        NotificationSystem.setNotificationHandler { title, message ->
+            showTimedNotification(title, message)
+        }
+    }
 
     fun showNotification(text: String) {
         viewModelScope.launch {
             message.value = text
+            notificationTitle.value = "Новая задача"
             notifyActive.value = true
             delay(4000)
+            notifyActive.value = false
+        }
+    }
+
+    private fun showTimedNotification(title: String, text: String) {
+        viewModelScope.launch {
+            notificationTitle.value = title
+            message.value = text
+            notifyActive.value = true
+            delay(5000)
             notifyActive.value = false
         }
     }
@@ -48,7 +66,7 @@ class SharedViewModel : ViewModel() {
 
         scheduleTaskNotification(newTask)
 
-        showNotification("Added: ${newTask.title}")
+        showNotification("Добавлена задача: ${newTask.title}")
         return true
     }
 

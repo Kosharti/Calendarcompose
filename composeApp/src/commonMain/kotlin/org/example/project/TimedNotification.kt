@@ -5,9 +5,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,49 +35,61 @@ import kotlinproject.composeapp.generated.resources.ic_task_notification
 import kotlinx.coroutines.delay
 import org.example.project.theme.InterFontFamily
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-actual fun Notify(message: String) {
+fun TimedNotification(title: String, message: String) {
     var visible by remember { mutableStateOf(true) }
+
     LaunchedEffect(Unit) {
-        delay(3000)
+        delay(5000)
         visible = false
     }
 
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn() + slideInVertically(initialOffsetY = { it }),
-        exit = fadeOut() + slideOutVertically(targetOffsetY = { it })
+        enter = fadeIn() + slideInVertically(initialOffsetY = { -it }),
+        exit = fadeOut() + slideOutVertically(targetOffsetY = { -it })
     ) {
         Box(
             modifier = Modifier
                 .padding(horizontal = 24.dp, vertical = 16.dp)
-                .zIndex(2f)
+                .zIndex(3f)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .background(Color(0xFFFFD700), RoundedCornerShape(12.dp))
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .background(Color(0xFFDE496E), RoundedCornerShape(16.dp))
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
                     .fillMaxWidth()
             ) {
                 Icon(
                     painter = painterResource(Res.drawable.ic_task_notification),
-                    contentDescription = "Notification Icon",
+                    contentDescription = "Reminder Icon",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(28.dp)
                 )
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-                Text(
-                    text = message,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.weight(1f)
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = title,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = InterFontFamily()
+                    )
+                    Text(
+                        text = message,
+                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        fontFamily = InterFontFamily(),
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
         }
     }
