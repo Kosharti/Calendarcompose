@@ -18,13 +18,11 @@ class SharedViewModel : ViewModel() {
     private var notificationService: NotificationService? = null
     private var platformContext: Any? = null
 
-    // Для Android версии
     fun initializeWithContext(context: Any) {
         notificationService = NotificationService(context)
         platformContext = context
     }
 
-    // Для Desktop версии
     fun initializeForDesktop() {
         notificationService = NotificationService(null)
         platformContext = null
@@ -56,7 +54,6 @@ class SharedViewModel : ViewModel() {
     private fun scheduleTaskNotification(task: Task) {
         viewModelScope.launch {
             val taskDateTime = LocalDateTime.of(task.date, LocalTime.parse(task.starttime))
-
             schedulePlatformSpecificNotification(task, taskDateTime)
         }
     }
@@ -91,7 +88,6 @@ class SharedViewModel : ViewModel() {
         tasksState.update { current ->
             current.copy(allTasks = tasks)
         }
-
         tasks.forEach { scheduleTaskNotification(it) }
     }
 }

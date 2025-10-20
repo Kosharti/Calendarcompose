@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import org.example.project.data.Task
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -17,16 +16,6 @@ class AndroidNotificationScheduler {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             val triggerTime = taskDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
-            Log.d("🔔 DEBUG", "=== SCHEDULING REMINDER ===")
-            Log.d("🔔 DEBUG", "Task: '${task.title}'")
-            Log.d("🔔 DEBUG", "Task date: ${task.date}")
-            Log.d("🔔 DEBUG", "Task start time: ${task.starttime}")
-            Log.d("🔔 DEBUG", "Calculated DateTime: $taskDateTime")
-            Log.d("🔔 DEBUG", "Trigger time (ms): $triggerTime")
-            Log.d("🔔 DEBUG", "Current time (ms): ${System.currentTimeMillis()}")
-            Log.d("🔔 DEBUG", "Delay (ms): ${triggerTime - System.currentTimeMillis()}")
-            Log.d("🔔 DEBUG", "Delay (minutes): ${(triggerTime - System.currentTimeMillis()) / 1000 / 60} min")
 
             val intent = Intent(context, ReminderReceiver::class.java).apply {
                 putExtra("title", "Напоминание: ${task.title}")
@@ -56,8 +45,6 @@ class AndroidNotificationScheduler {
             } else {
                 alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
             }
-
-            Log.d("🔔 DEBUG", "Reminder scheduled successfully!")
         }
     }
 }
