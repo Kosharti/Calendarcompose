@@ -13,12 +13,11 @@ class NotificationManager(private val notificationService: NotificationService?)
 
         if (delayMillis > 0) {
             delay(delayMillis)
-            showTaskReminderNotification(task) // ВЫЗОВ СИСТЕМНОГО УВЕДОМЛЕНИЯ
+            showTaskReminderNotification(task)
         }
     }
 
     private fun showTaskReminderNotification(task: Task) {
-        // ПРЯМОЙ ВЫЗОВ СИСТЕМНОГО УВЕДОМЛЕНИЯ
         notificationService?.showReminderNotification(
             "Напоминание: ${task.title}",
             "Время: ${task.starttime} - ${task.endtime}\n${task.note}"

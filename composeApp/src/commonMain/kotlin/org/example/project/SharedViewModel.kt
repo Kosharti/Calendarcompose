@@ -16,15 +16,18 @@ class SharedViewModel : ViewModel() {
     val tasksState = MutableStateFlow(TasksState())
 
     private var notificationService: NotificationService? = null
+    private var platformContext: Any? = null
 
     // Для Android версии
     fun initializeWithContext(context: Any) {
         notificationService = NotificationService(context)
+        platformContext = context
     }
 
     // Для Desktop версии
     fun initializeForDesktop() {
         notificationService = NotificationService(null)
+        platformContext = null
     }
 
     fun addTask(newTask: Task): Boolean {
@@ -46,19 +49,30 @@ class SharedViewModel : ViewModel() {
         }
 
         scheduleTaskNotification(newTask)
-        showTaskCreationNotification(newTask) // ВЫЗОВ СИСТЕМНОГО УВЕДОМЛЕНИЯ
+        showTaskCreationNotification(newTask)
         return true
     }
 
     private fun scheduleTaskNotification(task: Task) {
         viewModelScope.launch {
             val taskDateTime = LocalDateTime.of(task.date, LocalTime.parse(task.starttime))
-            NotificationManager(notificationService).scheduleTaskNotification(task, taskDateTime)
+
+            schedulePlatformSpecificNotification(task, taskDateTime)
+        }
+    }
+
+    private suspend fun schedulePlatformSpecificNotification(task: Task, taskDateTime: LocalDateTime) {
+        when {
+            isAndroidContext(platformContext) -> {
+                scheduleAndroidReminder(platformContext!!, task, taskDateTime)
+            }
+            else -> {
+                NotificationManager(notificationService).scheduleTaskNotification(task, taskDateTime)
+            }
         }
     }
 
     private fun showTaskCreationNotification(task: Task) {
-        // ПРЯМОЙ ВЫЗОВ СИСТЕМНОГО УВЕДОМЛЕНИЯ
         notificationService?.showNotification(
             "Добавлена задача: ${task.title}",
             "Время: ${task.starttime} - ${task.endtime}"

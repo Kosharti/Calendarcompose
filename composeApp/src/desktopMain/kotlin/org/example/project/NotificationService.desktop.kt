@@ -19,28 +19,22 @@ actual class NotificationService actual constructor(private val context: Any?) {
             if (SystemTray.isSupported()) {
                 val tray = SystemTray.getSystemTray()
 
-                // Создаем простую иконку (можно заменить на вашу)
                 val image = Toolkit.getDefaultToolkit().createImage("")
                 val trayIcon = TrayIcon(image, "Schedule App")
                 trayIcon.isImageAutoSize = true
 
-                // Добавляем в трей
                 tray.add(trayIcon)
 
-                // ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ
                 trayIcon.displayMessage(title, message, TrayIcon.MessageType.INFO)
 
-                // Удаляем через 5 секунд
                 Thread {
                     Thread.sleep(5000)
                     tray.remove(trayIcon)
                 }.start()
             } else {
-                // Fallback для систем без трея
                 println("🔔 $title: $message")
             }
         } catch (e: Exception) {
-            // Если что-то пошло не так, хотя бы выводим в консоль
             println("🔔 $title: $message")
             e.printStackTrace()
         }

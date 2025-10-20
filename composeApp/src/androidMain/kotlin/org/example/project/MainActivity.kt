@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
 
 class MainActivity : ComponentActivity() {
@@ -16,7 +17,7 @@ class MainActivity : ComponentActivity() {
         viewModel.initializeWithContext(this)
 
         setContent {
-            App(viewModel)  // ← ПЕРЕДАЁМ ViewModel В APP
+            App(viewModel)
         }
     }
 }
@@ -24,6 +25,6 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    val viewModel = SharedViewModel()  // ← ДЛЯ ПРЕВЬЮ
+    val viewModel = remember { SharedViewModel().apply { initializeForDesktop() } }
     App(viewModel)
 }

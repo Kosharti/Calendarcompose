@@ -10,7 +10,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun App(viewModel: SharedViewModel) {  // ← ПРИНИМАЕМ ViewModel ИЗВНЕ
+fun App(viewModel: SharedViewModel) {
     MaterialTheme {
         val navController = rememberNavController()
 

@@ -12,6 +12,6 @@ fun main() = application {
         val viewModel = remember { SharedViewModel() }
         viewModel.initializeForDesktop()
 
-        App(viewModel)  // ← ПЕРЕДАЁМ ViewModel В APP
+        App(viewModel)
     }
 }
